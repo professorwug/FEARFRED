@@ -3,4 +3,11 @@ website:
     contents:
       - index.ipynb
       - 00_core.ipynb
+      - 01_FlowGenerator.ipynb
       - 01a_Toy_Graph_Datasets.ipynb
+      - 02a_EEEMD.ipynb
+      - GAN_Embedder.ipynb
+      - GraphBuilder.ipynb
+      - Manifolds.ipynb
+      - Plotting.ipynb
+      - ScatteringDiscriminator.ipynb

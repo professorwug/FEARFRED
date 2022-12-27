@@ -1,0 +1,10 @@
+{
+  "eablokker.tabsSidebar.config.customKindGroupsOrder" : [
+    "ini",
+    "json"
+  ],
+  "eablokker.tabsSidebar.config.customTabOrder" : [
+    "\/Users\/adjourner\/Projects\/FEARFRED\/settings.ini",
+    "\/Users\/adjourner\/Projects\/FEARFRED\/.nova\/Configuration.json"
+  ]
+}
