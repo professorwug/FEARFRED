@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Learning a flow field that, when sampled, matches a class of directed graphs">
+
+<title>FEARFRED - 04 Directed Graph Embedding by GAN</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="FEARFRED - 04 Directed Graph Embedding by GAN">
+<meta property="og:description" content="Learning a flow field that, when sampled, matches a class of directed graphs">
+<meta property="og:site-name" content="FEARFRED">
+<meta name="twitter:title" content="FEARFRED - 04 Directed Graph Embedding by GAN">
+<meta name="twitter:description" content="Learning a flow field that, when sampled, matches a class of directed graphs">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">FEARFRED</span>
+  </a>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">04 Directed Graph Embedding by GAN</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">FEARFRED</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./core.html" class="sidebar-item-text sidebar-link">core</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./visualization_utils.html" class="sidebar-item-text sidebar-link">Visualization functions</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./toy_graph_datasets.html" class="sidebar-item-text sidebar-link">Toy Graph Datasets for FRED</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./manifolds.html" class="sidebar-item-text sidebar-link">00c Manifold Datasets</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./flow_generator.html" class="sidebar-item-text sidebar-link">01 The Flow Generator of Directed Graphs</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./graph_builder.html" class="sidebar-item-text sidebar-link">02 Graph Builder</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./scattering_discriminator.html" class="sidebar-item-text sidebar-link">03 Scattering Discriminator</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./gan_embedder.html" class="sidebar-item-text sidebar-link active">04 Directed Graph Embedding by GAN</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">ARCHIVES</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ARCHIVES/eeemd.html" class="sidebar-item-text sidebar-link">EEEMD: Edge-to-Edge Earth Mover’s Distance</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#training" id="toc-training" class="nav-link active" data-scroll-target="#training">Training</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/professorwug/FEARFRED/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">04 Directed Graph Embedding by GAN</h1>
+</div>
+
+<div>
+  <div class="description">
+    Learning a flow field that, when sampled, matches a class of directed graphs
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn.functional <span class="im">as</span> F</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> FEARFRED.generator <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> FEARFRED.discriminator <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> FEARFRED.graph_builder <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> FRED_A_GAN(nn.Module):</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                 intrinsic_dimension, <span class="co"># intrinsic dimension of data</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                 n_nodes, <span class="co"># number of nodes in directed subgraphs</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                 n_features, <span class="co"># number of features per node</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                ):</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.intrinsic_dimension <span class="op">=</span> intrinsic_dimension</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.n_nodes <span class="op">=</span> n_nodes</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.n_features <span class="op">=</span> n_features <span class="op">+</span> <span class="dv">1</span> <span class="co"># we include an extra vector of 1s when feeding to the discriminator</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="co"># initialize GAN machineru</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.generator <span class="op">=</span> FlowGenerator(<span class="va">self</span>.intrinsic_dimension,n_features) <span class="co"># generates the actual number of featuers</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.discriminator <span class="op">=</span> ScatteringDiscriminator(<span class="va">self</span>.n_nodes,<span class="va">self</span>.n_features)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> generate_fake(<span class="va">self</span>):</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 1. sample from the unit hypercube</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="co"># </span><span class="al">TODO</span><span class="co">: Could adjust this to sample from parts of the hypercube</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        <span class="co"># to get localized subgraphs</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        samples <span class="op">=</span> torch.randn(<span class="va">self</span>.n_nodes,<span class="va">self</span>.intrinsic_dimension)</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 2. Translate to a sample in the embedding space, and take flows</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        points, flows, features <span class="op">=</span> <span class="va">self</span>.generator(samples)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 3. construct a directed graph based off of these points and flows, </span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># and create summary node features for it</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        A <span class="op">=</span> flashlight_kernel(points,flows,kernel_type<span class="op">=</span><span class="st">'fixed'</span>, sigma<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># simplify graph with this nonlinearity</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        A[A<span class="op">&lt;</span><span class="fl">0.01</span>] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        <span class="co"># </span><span class="al">TODO</span><span class="co">: Might have to revise that.</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        node_features <span class="op">=</span> torch.ones(<span class="va">self</span>.n_nodes,<span class="va">self</span>.n_features).<span class="bu">float</span>()</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        node_features[:,<span class="dv">1</span>:] <span class="op">=</span> features</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> A, node_features</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> train_critic(<span class="va">self</span>, A, features):</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>        <span class="co"># generate a fake image and run it through the discriminator</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>        fakeA, fake_features <span class="op">=</span> <span class="va">self</span>.generate_fake()</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>        <span class="co"># detach gradients when training critic, to prevent unnecessary backprop graph construction</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>        fakeA <span class="op">=</span> fakeA.detach()</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>        fake_features <span class="op">=</span> fake_features.detach()</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>        witness_of_fake <span class="op">=</span> <span class="va">self</span>.discriminator(fakeA,fake_features)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Test the critic on real data</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>        node_features <span class="op">=</span> torch.ones(<span class="va">self</span>.n_nodes,<span class="va">self</span>.n_features).<span class="bu">float</span>()</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>        node_features[:,<span class="dv">1</span>:] <span class="op">=</span> features</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Run through discriminator and compute loss</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>        witness_of_real <span class="op">=</span> <span class="va">self</span>.discriminator(A,node_features)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Loss is the difference between the witness function of fake and real</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>        <span class="co"># The critic wants to maximize this difference</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> witness_of_fake <span class="op">-</span> witness_of_real</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> loss</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> train_generator(<span class="va">self</span>,A,features):</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 1. sample from the unit hypercube</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>        <span class="co"># </span><span class="al">TODO</span><span class="co">: Could adjust this to sample from parts of the hypercube</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>        <span class="co"># to get localized subgraphs</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>        fakeA, fake_features <span class="op">=</span> <span class="va">self</span>.generate_fake()</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 4. Run the graph and its features through the discriminator</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>        witness_of_fake <span class="op">=</span> <span class="va">self</span>.discriminator(fakeA,fake_features)</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>        <span class="co"># generator wants to minimize the witness function on its data</span></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> <span class="op">-</span> witness_of_fake</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> loss</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Testing that it runs on fake data</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> torch.rand(<span class="dv">10</span>,<span class="dv">10</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>features <span class="op">=</span> torch.rand(<span class="dv">10</span>,<span class="dv">2</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>fredtest <span class="op">=</span> FRED_A_GAN(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    intrinsic_dimension <span class="op">=</span> <span class="dv">2</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    n_nodes <span class="op">=</span> <span class="dv">10</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    n_features <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>l_g <span class="op">=</span> fredtest.train_generator(A,features)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>l_d <span class="op">=</span> fredtest.train_critic(A,features)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="training" class="level1">
+<h1>Training</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>n_epochs <span class="op">=</span> <span class="dv">500</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>n_critic <span class="op">=</span> <span class="dv">5</span> <span class="co"># number of times to train the critic for each training iteration of the generator</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>weight_clipping_value <span class="op">=</span> <span class="fl">0.01</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>fred <span class="op">=</span> FRED_A_GAN(</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    intrinsic_dimension <span class="op">=</span> <span class="dv">2</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    n_nodes <span class="op">=</span> <span class="dv">128</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    n_features <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>opt_gen <span class="op">=</span> torch.optim.Adam(fred.generator.parameters())</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>opt_discrim <span class="op">=</span> torch.optim.Adam(fred.discriminator.parameters())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> FEARFRED.datasets.manifolds <span class="im">import</span> DirectedCircle</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.utils.data <span class="im">import</span> DataLoader</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> DirectedCircle()</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>dataloader <span class="op">=</span> DataLoader(d, batch_size<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> FEARFRED.plotting <span class="im">import</span> plot_flow_field_2d</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> e <span class="kw">in</span> trange(n_epochs):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    i <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> A, features <span class="kw">in</span> dataloader:</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        i <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="co"># shape wrangling: presently each batch has but a single matrix and list of features</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        A <span class="op">=</span> A[<span class="dv">0</span>].<span class="bu">float</span>()</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        features <span class="op">=</span> features[<span class="dv">0</span>][:,<span class="va">None</span>] <span class="co"># reshape to n_nodes x n_features</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        features <span class="op">=</span> features.<span class="bu">float</span>()</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        opt_discrim.zero_grad()</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> fred.train_critic(A, features)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> loss.item() <span class="op">!=</span> loss.item():</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">"A nan has been found in d! investigate please"</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">NotImplementedError</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        loss.backward()</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        opt_discrim.step()</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        <span class="co"># print('discrim loss',loss)</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> p <span class="kw">in</span> fred.discriminator.parameters():</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>            p.data.clamp_(<span class="op">-</span>weight_clipping_value, weight_clipping_value)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> i <span class="op">%</span> n_critic <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Train generator</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>            opt_gen.zero_grad()</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>            loss <span class="op">=</span> fred.train_generator(A, features)</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>            <span class="co"># print('gen loss',loss)</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> loss.item() <span class="op">!=</span> loss.item():</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="st">"A nan has been found in g! investigate please"</span>)</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>                <span class="cf">raise</span> <span class="pp">NotImplementedError</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>            loss.backward()</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>            opt_gen.step()</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> e <span class="op">%</span> <span class="dv">50</span><span class="op">==</span><span class="dv">0</span>:</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>        plot_flow_field_2d(fred.generator)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>  0%|                                                    | 0/500 [00:00&lt;?, ?it/s]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="04_GAN_Embedder_files/figure-html/cell-9-output-2.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code> 10%|████▎                                      | 50/500 [01:39&lt;14:57,  1.99s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="04_GAN_Embedder_files/figure-html/cell-9-output-4.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code> 20%|████████▍                                 | 100/500 [03:19&lt;13:20,  2.00s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="04_GAN_Embedder_files/figure-html/cell-9-output-6.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code> 30%|████████████▌                             | 150/500 [04:58&lt;11:27,  1.96s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="04_GAN_Embedder_files/figure-html/cell-9-output-8.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code> 40%|████████████████▊                         | 200/500 [06:37&lt;09:49,  1.97s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="04_GAN_Embedder_files/figure-html/cell-9-output-10.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code> 50%|█████████████████████                     | 250/500 [08:15&lt;08:11,  1.96s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="04_GAN_Embedder_files/figure-html/cell-9-output-12.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code> 60%|█████████████████████████▏                | 300/500 [09:54&lt;06:34,  1.97s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="04_GAN_Embedder_files/figure-html/cell-9-output-14.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code> 70%|█████████████████████████████▍            | 350/500 [11:33&lt;04:57,  1.98s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="04_GAN_Embedder_files/figure-html/cell-9-output-16.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code> 80%|█████████████████████████████████▌        | 400/500 [13:12&lt;03:16,  1.96s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="04_GAN_Embedder_files/figure-html/cell-9-output-18.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code> 90%|█████████████████████████████████████▊    | 450/500 [14:51&lt;01:39,  1.98s/it]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="04_GAN_Embedder_files/figure-html/cell-9-output-20.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>100%|██████████████████████████████████████████| 500/500 [16:29&lt;00:00,  1.98s/it]</code></pre>
+</div>
+</div>
+<p>Here are some visualization functions to gauge progress during training</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> FEARFRED.plotting <span class="im">import</span> plot_flow_field_2d</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>plot_flow_field_2d(fred.generator)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="04_GAN_Embedder_files/figure-html/cell-10-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>fred.generate_fake()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>(tensor([[0.0000, 0.4712, 0.0761,  ..., 0.0743, 0.0746, 0.0739],
+         [0.0922, 0.0000, 0.0756,  ..., 0.0739, 0.0742, 0.0735],
+         [0.5618, 0.5587, 0.0000,  ..., 0.0754, 0.0757, 0.0749],
+         ...,
+         [0.5492, 0.5459, 0.5567,  ..., 0.0000, 0.3682, 0.0916],
+         [0.5514, 0.5481, 0.5590,  ..., 0.1184, 0.0000, 0.0764],
+         [0.5460, 0.5427, 0.5535,  ..., 0.4742, 0.5643, 0.0000]],
+        grad_fn=&lt;IndexPutBackward0&gt;),
+ tensor([[1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1029],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1028],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1028],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1035],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1029],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1038],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1031],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1028],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1029],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027],
+         [1.0000, 3.1027]], grad_fn=&lt;CopySlices&gt;))</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>node_features <span class="op">=</span> torch.ones(<span class="bu">len</span>(A),<span class="dv">2</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>node_features[:,<span class="dv">1</span>:] <span class="op">=</span> features</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>fred.discriminator(A,node_features)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>tensor([[-0.0095]], grad_fn=&lt;AddmmBackward0&gt;)</code></pre>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

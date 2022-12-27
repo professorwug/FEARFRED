@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>FEARFRED - Visualization functions</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="FEARFRED - Visualization functions">
+<meta property="og:description" content="source">
+<meta property="og:site-name" content="FEARFRED">
+<meta name="twitter:title" content="FEARFRED - Visualization functions">
+<meta name="twitter:description" content="source">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">FEARFRED</span>
+  </a>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Visualization functions</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">FEARFRED</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./core.html" class="sidebar-item-text sidebar-link">core</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./visualization_utils.html" class="sidebar-item-text sidebar-link active">Visualization functions</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./toy_graph_datasets.html" class="sidebar-item-text sidebar-link">Toy Graph Datasets for FRED</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./manifolds.html" class="sidebar-item-text sidebar-link">00c Manifold Datasets</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./flow_generator.html" class="sidebar-item-text sidebar-link">01 The Flow Generator of Directed Graphs</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./graph_builder.html" class="sidebar-item-text sidebar-link">02 Graph Builder</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./scattering_discriminator.html" class="sidebar-item-text sidebar-link">03 Scattering Discriminator</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./gan_embedder.html" class="sidebar-item-text sidebar-link">04 Directed Graph Embedding by GAN</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">ARCHIVES</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./ARCHIVES/eeemd.html" class="sidebar-item-text sidebar-link">EEEMD: Edge-to-Edge Earth Mover’s Distance</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#plotting-a-2d-flow-field" id="toc-plotting-a-2d-flow-field" class="nav-link active" data-scroll-target="#plotting-a-2d-flow-field">Plotting a 2D flow field</a>
+  <ul class="collapse">
+  <li><a href="#plot_directed_2d" id="toc-plot_directed_2d" class="nav-link" data-scroll-target="#plot_directed_2d">plot_directed_2d</a></li>
+  <li><a href="#plot_flow_field_2d" id="toc-plot_flow_field_2d" class="nav-link" data-scroll-target="#plot_flow_field_2d">plot_flow_field_2d</a></li>
+  </ul></li>
+  <li><a href="#plotting-3d-manifolds" id="toc-plotting-3d-manifolds" class="nav-link" data-scroll-target="#plotting-3d-manifolds">Plotting 3d Manifolds</a>
+  <ul class="collapse">
+  <li><a href="#plot_directed_3d" id="toc-plot_directed_3d" class="nav-link" data-scroll-target="#plot_directed_3d">plot_directed_3d</a></li>
+  <li><a href="#plot_origin_3d" id="toc-plot_origin_3d" class="nav-link" data-scroll-target="#plot_origin_3d">plot_origin_3d</a></li>
+  </ul></li>
+  <li><a href="#plotting-graphs" id="toc-plotting-graphs" class="nav-link" data-scroll-target="#plotting-graphs">Plotting Graphs</a>
+  <ul class="collapse">
+  <li><a href="#visualize_graph" id="toc-visualize_graph" class="nav-link" data-scroll-target="#visualize_graph">visualize_graph</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/professorwug/FEARFRED/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Visualization functions</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="plotting-a-2d-flow-field" class="level2">
+<h2 class="anchored" data-anchor-id="plotting-a-2d-flow-field">Plotting a 2D flow field</h2>
+<hr>
+<p><a href="https://github.com/professorwug/FEARFRED/blob/main/FEARFRED/plotting.py#L10" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="plot_directed_2d" class="level3">
+<h3 class="anchored" data-anchor-id="plot_directed_2d">plot_directed_2d</h3>
+<blockquote class="blockquote">
+<pre><code> plot_directed_2d (X, flows, labels=None, mask_prob=0.5, cmap='viridis',
+                   ax=None, save=False, use_streamlines=True, title='',
+                   filename='', equal_aspect_ratio=True, minimal=False,
+                   arrow_scale=8)</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/professorwug/FEARFRED/blob/main/FEARFRED/plotting.py#L47" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="plot_flow_field_2d" class="level3">
+<h3 class="anchored" data-anchor-id="plot_flow_field_2d">plot_flow_field_2d</h3>
+<blockquote class="blockquote">
+<pre><code> plot_flow_field_2d (FG, n_samples=500, arrow_scale=8)</code></pre>
+</blockquote>
+<table class="table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 25%">
+<col style="width: 34%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>FG</td>
+<td></td>
+<td></td>
+<td>An instance of the FlowGenerator class</td>
+</tr>
+<tr class="even">
+<td>n_samples</td>
+<td>int</td>
+<td>500</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>arrow_scale</td>
+<td>int</td>
+<td>8</td>
+<td>size of the arrows in the embedding. A smaller number creates larger arrows.</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="plotting-3d-manifolds" class="level1">
+<h1>Plotting 3d Manifolds</h1>
+<hr>
+<p><a href="https://github.com/professorwug/FEARFRED/blob/main/FEARFRED/plotting.py#L65" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="plot_directed_3d" class="level3">
+<h3 class="anchored" data-anchor-id="plot_directed_3d">plot_directed_3d</h3>
+<blockquote class="blockquote">
+<pre><code> plot_directed_3d (X, flow, labels=None, mask_prob=0.5, cmap='viridis',
+                   origin=False, ax=None, save=False, filename='',
+                   plot_minimal=False)</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/professorwug/FEARFRED/blob/main/FEARFRED/plotting.py#L59" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="plot_origin_3d" class="level3">
+<h3 class="anchored" data-anchor-id="plot_origin_3d">plot_origin_3d</h3>
+<blockquote class="blockquote">
+<pre><code> plot_origin_3d (ax, xlim, ylim, zlim)</code></pre>
+</blockquote>
+</section>
+</section>
+<section id="plotting-graphs" class="level1">
+<h1>Plotting Graphs</h1>
+<hr>
+<p><a href="https://github.com/professorwug/FEARFRED/blob/main/FEARFRED/plotting.py#L109" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="visualize_graph" class="level3">
+<h3 class="anchored" data-anchor-id="visualize_graph">visualize_graph</h3>
+<blockquote class="blockquote">
+<pre><code> visualize_graph (adjacency, is_networkx=False, to_undirected=False,
+                  ax=None)</code></pre>
+</blockquote>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

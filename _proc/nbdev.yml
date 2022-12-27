@@ -3,7 +3,7 @@ project:
 
 website:
   title: "FEARFRED"
-  site-url: "https://professorwug.github.io/FEARFRED"
+  site-url: "https://x.riddle.press/FEARFRED"
   description: "Next generation of FRED"
   repo-branch: main
   repo-url: "https://github.com/professorwug/FEARFRED"
