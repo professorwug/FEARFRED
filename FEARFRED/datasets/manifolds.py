@@ -3,7 +3,8 @@
 # %% auto 0
 __all__ = ['xy_tilt', 'rotation_transform', 'add_noise', 'directed_circle', 'directed_spiral', 'directed_spiral_uniform',
            'directed_spiral_delayed', 'generate_prism', 'directed_cylinder', 'directed_swiss_roll',
-           'directed_swiss_roll_uniform', 'directed_swiss_roll_delayed', 'DirectedCircle']
+           'directed_swiss_roll_uniform', 'directed_swiss_roll_delayed', 'DirectedCircle', 'SwissRoll', 'double_helix',
+           'DoubleHelix']
 
 # %% ../../nbs/00c_Manifolds.ipynb 4
 # Tilt 2d plane into 3d space
@@ -375,6 +376,87 @@ class DirectedCircle(Dataset):
     def __getitem__(self, i):
         X, flows, labels = directed_circle(
             num_nodes = self.n_nodes
+        )
+        X = torch.tensor(X)
+        flows = torch.tensor(flows)
+        features = torch.tensor(labels)
+        A = flashlight_kernel(X, flows, kernel_type='fixed',sigma=0.7)
+        # threshold to top 10% of edges
+        A[A<0.01] = 0
+        return A, features
+
+# %% ../../nbs/00c_Manifolds.ipynb 41
+class SwissRoll(Dataset):
+    """
+    Samples directed graphs from a swiss roll. Each batch has an adjacency matrix and a set of flows
+    """
+    def __init__(self,
+                n_nodes = 128, # number of nodes per batch
+                n_batches = 100 # number of batches in dataset
+                ):
+        self.n_nodes = n_nodes
+        self.n_batches = n_batches
+    def __len__(self):
+        return self.n_batches
+    def __getitem__(self, i):
+        X, flows, labels = directed_swiss_roll_delayed(
+            num_nodes = self.n_nodes
+        )
+        X = torch.tensor(X)
+        flows = torch.tensor(flows)
+        features = torch.tensor(labels)
+        A = flashlight_kernel(X, flows, kernel_type='fixed',sigma=0.7)
+        # threshold to top 10% of edges
+        A[A<0.01] = 0
+        return A, features
+
+# %% ../../nbs/00c_Manifolds.ipynb 43
+def double_helix(num_nodes = 1000, noise=0, num_spirals = 2):
+    """
+    Creates a noisy double helix, with specified number nodes, spirals, and noise level
+    """
+    num_nodes = num_nodes // 2
+    X1_z = np.sort(np.random.rand(num_nodes)*2*np.pi*num_spirals)
+    X1_x = np.sin(X1_z)
+    X1_y = np.cos(X1_z)
+    X1 = np.column_stack([X1_x, X1_y, X1_z])
+    X1 += np.random.randn(num_nodes,3)*noise
+    flows_1 = np.column_stack([np.cos(X1_z),-np.sin(X1_z),np.ones(num_nodes)])
+    labels_1 = np.zeros(num_nodes)
+    # And form second helix
+    offset = np.pi
+    X2_z = np.sort(np.random.rand(num_nodes)*2*np.pi*num_spirals)
+    X2_x = np.sin(X2_z + offset)
+    X2_y = np.cos(X2_z + offset)
+    X2 = np.column_stack([X2_x, X2_y, X2_z])
+    X2 += np.random.randn(num_nodes,3)*noise
+    flows_2 = np.column_stack([-np.cos(X2_z + offset),np.sin(X2_z + offset),-np.ones(num_nodes)])
+    labels_2 = np.ones(num_nodes)
+    # combine them
+    X = np.vstack([X1, X2])
+    flows = np.vstack([flows_1,flows_2])
+    labels = np.concatenate([labels_1, labels_2],axis=0)
+    return X, flows, labels
+
+# %% ../../nbs/00c_Manifolds.ipynb 44
+class DoubleHelix(Dataset):
+    """
+    Samples directed graphs from a double helix. Each batch has an adjacency matrix and a set of flows
+    """
+    def __init__(self,
+                n_nodes = 128, # number of nodes per batch
+                n_batches = 100, # number of batches in dataset
+                noise = 0, # Noise level of double helix
+                ):
+        self.n_nodes = n_nodes
+        self.n_batches = n_batches
+        self.noise = noise
+    def __len__(self):
+        return self.n_batches
+    def __getitem__(self, i):
+        X, flows, labels = double_helix(
+            num_nodes = self.n_nodes,
+            noise = self.noise
         )
         X = torch.tensor(X)
         flows = torch.tensor(flows)

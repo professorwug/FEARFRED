@@ -8,13 +8,13 @@ def scatter_moments(data, moments_returned=2):
     # given a matrix of node features of shape n_nodes x n_features, 
     # returns a vector of length moments_returned x n_features comprising the mean and 
     # variance of each feature
-    statistical_moments = {"mean": torch.zeros(0)}
+    statistical_moments = {"mean": torch.zeros(0, device=data.device)}
     if moments_returned >= 2:
-        statistical_moments["variance"] = torch.zeros(0)
+        statistical_moments["variance"] = torch.zeros(0,device=data.device)
     if moments_returned >= 3:
-        statistical_moments["skew"] = torch.zeros(0)
+        statistical_moments["skew"] = torch.zeros(0,device=data.device)
     if moments_returned >= 4:
-        statistical_moments["kurtosis"] = torch.zeros(0)
+        statistical_moments["kurtosis"] = torch.zeros(0,device=data.device)
     def m(i):  # ith moment, computed with derivation data
         return torch.mean(deviation_data ** i, axis=1)
     mean = torch.mean(data, dim=1, keepdim=True)
@@ -108,7 +108,7 @@ class ScatteringDiscriminator(nn.Module):
         # Adapted from Alex Tong's LEGSNet code
         # construct diffusion matrix
         D = torch.sum(A,axis=1)
-        P = 1/2*torch.eye(len(A)) + 1/2*(F.normalize(A,dim=1,p=1)) # TODO: ensure no self loops in A
+        P = 1/2*torch.eye(len(A),device = A.device) + 1/2*(F.normalize(A,dim=1,p=1)) # TODO: ensure no self loops in A
         # TODO: Could make laziness learnable.
         # diffuse 16 times
         avgs = [node_features[:,:,None]]

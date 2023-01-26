@@ -60,6 +60,7 @@ class FlowGenerator(nn.Module):
         x = self.flow_artist_l7(x)
         x = F.gelu(x)
         x = self.flow_artist_l8(x)
+        x = F.sigmoid(x)
         return x
     def flow_sampler(self,x):
         # samples from the embedding space. Should be given inputs in [0,1]^n
